@@ -10,7 +10,6 @@ credentials.json
 supabase/
 apps-script/
 tests/
-scripts/
 
 # Dependencies & Build Artefacts
 node_modules/
@@ -18,3 +17,4 @@ node_modules/
 .github/
 .vscode/
 *.log
+

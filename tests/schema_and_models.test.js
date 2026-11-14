@@ -63,3 +63,4 @@ describe('Milestone 2: Schema & Business Rules Verification', () => {
     expect(validUpi('invalid_upi_no_handle')).toBe(false);
   });
 });
+

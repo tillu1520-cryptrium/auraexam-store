@@ -65,3 +65,4 @@
 - [ ] **Run Build Validation**: `npm run build` (all 9 files verified).
 - [ ] **Configure Vercel Environment**: Add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_BRAND_NAME`, `VITE_SUPPORT_EMAIL`.
 - [ ] **Deploy to Production**: `vercel --prod` (executed only after approval).
+

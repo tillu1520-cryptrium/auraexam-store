@@ -95,3 +95,4 @@ The project includes an enterprise GitHub Actions workflow at [`.github/workflow
    - `VERCEL_TOKEN`: Generated from [Vercel Account Tokens](https://vercel.com/account/tokens).
    - `VERCEL_ORG_ID`: Found in `.vercel/project.json` after linking.
    - `VERCEL_PROJECT_ID`: Found in `.vercel/project.json` after linking.
+

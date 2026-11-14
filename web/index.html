@@ -37,6 +37,7 @@
       <a href="#products">Question Papers</a>
       <a href="#how">How It Works</a>
       <a href="#refundDetails">75% Refund Policy</a>
+      <a href="#lookup">Access My PDFs</a>
       <a href="refund.html">Submit Refund</a>
       <a href="admin.html">Admin Portal</a>
     </nav>
@@ -329,6 +330,30 @@
         <div style="margin-top: 20px;">
           <a class="btn btn-secondary" href="refund.html">Submit Refund Request <span>↗</span></a>
         </div>
+      </div>
+    </section>
+
+    <!-- Order Lookup & PDF Download Section -->
+    <section class="section" id="lookup">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow-badge">Student Portal</div>
+          <h2>Access Your Purchased PDFs</h2>
+        </div>
+        <p>Already completed payment? Enter your email address or order reference number to view your question paper bundles anytime.</p>
+      </div>
+
+      <div class="glass" style="max-width: 680px; margin: 0 auto; padding: 32px; border-radius: var(--radius-md);">
+        <form id="orderLookupForm">
+          <div class="form-group" style="text-align: left;">
+            <label for="lookupInput">Student Email or Order Number</label>
+            <input id="lookupInput" type="text" required placeholder="e.g. name@example.com or EP-1794662...">
+          </div>
+          <button id="lookupSubmitBtn" type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">
+            Find My Study Bundles <span>🔍</span>
+          </button>
+        </form>
+        <div id="lookupResultsContainer" style="margin-top: 24px; display: none;"></div>
       </div>
     </section>
   </main>

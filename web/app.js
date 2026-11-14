@@ -344,6 +344,120 @@
     });
   }
 
+  // Student Order Lookup & PDF Retrieval
+  const lookupForm = document.getElementById('orderLookupForm');
+  const lookupInput = document.getElementById('lookupInput');
+  const lookupResults = document.getElementById('lookupResultsContainer');
+  const lookupSubmitBtn = document.getElementById('lookupSubmitBtn');
+
+  if (lookupForm) {
+    lookupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const identifier = lookupInput.value.trim();
+      if (!identifier) return;
+
+      if (!client) {
+        showToast('Database configuration pending.', true);
+        return;
+      }
+
+      lookupSubmitBtn.disabled = true;
+      lookupSubmitBtn.innerHTML = 'Searching Records… <span class="spinner"></span>';
+      lookupResults.style.display = 'block';
+      lookupResults.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 16px;">Searching your orders…</div>';
+
+      try {
+        const { data, error } = await client.functions.invoke('lookup-order', {
+          body: { identifier }
+        });
+
+        if (error || data?.error) {
+          throw new Error(data?.error || error?.message || 'Lookup failed.');
+        }
+
+        const orders = data.orders || [];
+        if (orders.length === 0) {
+          lookupResults.innerHTML = `
+            <div style="background: rgba(255, 80, 80, 0.08); border: 1px solid rgba(255, 80, 80, 0.2); padding: 20px; border-radius: var(--radius-sm); text-align: center;">
+              <strong style="color: #FF8B8B; display: block; margin-bottom: 6px;">No Orders Found</strong>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">
+                No completed records matched "<strong>${escapeHtml(identifier)}</strong>". If you recently made a payment, please allow up to 2 minutes for processing or contact support.
+              </p>
+            </div>
+          `;
+          return;
+        }
+
+        let ordersHtml = '';
+        orders.forEach(o => {
+          const isPaid = o.status === 'paid';
+          const badgeColor = isPaid ? 'var(--accent-emerald)' : 'var(--accent-purple)';
+          
+          let itemsHtml = '';
+          (o.items || []).forEach(it => {
+            itemsHtml += `
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px 18px; border-radius: 12px; margin-top: 10px;">
+                <div>
+                  <strong style="font-size: 0.95rem; color: var(--text-primary); display: block;">${escapeHtml(it.name)}</strong>
+                  <small style="color: var(--accent-cyan); font-weight: 600;">10 COMPLETE SETS IN 1 PDF</small>
+                </div>
+                ${isPaid && it.driveUrl ? `
+                  <a href="${it.driveUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">
+                    Open in Drive ↗
+                  </a>
+                ` : isPaid ? `
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">Access active via Drive email</span>
+                ` : `
+                  <span style="font-size: 0.85rem; color: #FFAA55;">Payment Pending</span>
+                `}
+              </div>
+            `;
+          });
+
+          ordersHtml += `
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-sm); padding: 22px; margin-bottom: 18px; text-align: left;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 12px;">
+                <div>
+                  <strong style="font-size: 1rem; color: var(--text-primary); display: block;">Order #${escapeHtml(o.orderNumber)}</strong>
+                  <small style="color: var(--text-muted); font-size: 0.8rem;">${new Date(o.createdAt).toLocaleString('en-IN')}</small>
+                </div>
+                <span style="color: ${badgeColor}; font-weight: 700; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.05em; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 999px;">
+                  ${escapeHtml(o.status)}
+                </span>
+              </div>
+              <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 12px;">
+                <span>Student: <strong>${escapeHtml(o.customerName || 'N/A')}</strong> (${escapeHtml(o.customerEmail || '')})</span> · 
+                <span>Total: <strong>${formatINR((o.totalAmountPaise || 0) / 100)}</strong></span>
+              </div>
+              <div>
+                <strong style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Purchased Question Paper Bundles:</strong>
+                ${itemsHtml}
+              </div>
+            </div>
+          `;
+        });
+
+        lookupResults.innerHTML = ordersHtml;
+
+      } catch (lErr) {
+        lookupResults.innerHTML = `
+          <div style="color: #FF8B8B; background: rgba(255,80,80,0.08); padding: 14px; border-radius: 8px; text-align: center; font-size: 0.9rem;">
+            ${escapeHtml(lErr.message || 'Lookup failed. Please verify your email or order number.')}
+          </div>
+        `;
+      } finally {
+        lookupSubmitBtn.disabled = false;
+        lookupSubmitBtn.innerHTML = 'Find My Study Bundles <span>🔍</span>';
+      }
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
+  }
+
   // Update current year in footer
   const yearEl = document.getElementById('currentYear');
   if (yearEl) yearEl.textContent = new Date().getFullYear();

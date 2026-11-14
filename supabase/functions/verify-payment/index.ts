@@ -127,6 +127,7 @@ Deno.serve(async (req) => {
     // 6. Build Idempotent Deliveries for primary products
     const customerEmail = (order.customers as any)?.email;
     const deliveryRows: any[] = [];
+    const downloads: Array<{ name: string; url: string }> = [];
 
     for (const item of (order.order_items as any[])) {
       if (item.products?.drive_file_id) {
@@ -137,6 +138,11 @@ Deno.serve(async (req) => {
           product_name: item.product_name_snapshot,
           drive_file_id: item.products.drive_file_id,
           status: "pending"
+        });
+
+        downloads.push({
+          name: item.product_name_snapshot,
+          url: `https://drive.google.com/file/d/${item.products.drive_file_id}/view?usp=sharing`
         });
       }
     }
@@ -186,6 +192,7 @@ Deno.serve(async (req) => {
     return jsonResponse({
       verified: true,
       orderNumber: order.order_number,
+      downloads: downloads,
       message: "Payment successfully verified. PDF access permissions are being provisioned."
     });
 

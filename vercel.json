@@ -42,6 +42,22 @@
     {
       "source": "/refund",
       "destination": "/refund.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/shipping",
+      "destination": "/shipping.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
     }
   ]
 }

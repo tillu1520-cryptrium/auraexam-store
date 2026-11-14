@@ -24,7 +24,11 @@ const requiredFiles = [
   'admin.css',
   'admin.js',
   'refund.html',
-  'refund.js'
+  'refund.js',
+  'terms.html',
+  'privacy.html',
+  'shipping.html',
+  'contact.html'
 ];
 
 let missing = 0;

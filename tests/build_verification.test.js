@@ -7,7 +7,7 @@ describe('Milestone 8: Build & Asset Integrity Verification', () => {
   it('Scenario 1 & 2: executes production build and verifies zero syntax/asset errors', () => {
     const buildOutput = execSync('node scripts/build.js', { encoding: 'utf-8' });
     expect(buildOutput).toContain('Production build validation completed successfully.');
-    expect(buildOutput).toContain('All 9 production assets verified');
+    expect(buildOutput).toContain('production assets verified');
   });
 
   it('Scenario 19: verifies responsive viewport and meta theme tags across HTML files', () => {

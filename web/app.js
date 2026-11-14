@@ -284,6 +284,22 @@
                 document.getElementById('modalOrderNum').textContent = orderData.orderNumber;
                 document.getElementById('modalEmail').textContent = email;
                 document.getElementById('modalBundles').textContent = Array.from(selectedSubjects).map(s => catalogue[s]?.name || s).join(', ');
+                
+                const linksContainer = document.getElementById('modalLinksContainer');
+                if (linksContainer) {
+                  if (Array.isArray(verifyData?.downloads) && verifyData.downloads.length > 0) {
+                    linksContainer.innerHTML = '<div style="font-size:0.85rem; font-weight:700; color:var(--accent-cyan); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em;">Instant Access Links:</div>' +
+                      verifyData.downloads.map(d => `
+                        <a href="${d.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width:100%; justify-content:space-between; padding:12px 18px; font-size:0.92rem;">
+                          <span>📥 Download ${escapeHtml(d.name)}</span>
+                          <span>↗</span>
+                        </a>
+                      `).join('');
+                  } else {
+                    linksContainer.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); background:rgba(255,255,255,0.04); padding:10px 14px; border-radius:10px;">Private Google Drive access has been shared to <strong>' + escapeHtml(email) + '</strong>. Check your inbox!</div>';
+                  }
+                }
+
                 receiptModal.classList.add('active');
               }
 

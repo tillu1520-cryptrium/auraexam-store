@@ -1,0 +1,20 @@
+# Secrets and Environment Variables
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# Backend and Non-Frontend Directories
+supabase/
+apps-script/
+tests/
+scripts/
+
+# Dependencies & Build Artefacts
+node_modules/
+.git/
+.github/
+.vscode/
+*.log

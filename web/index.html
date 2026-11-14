@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07090E">
+  <meta name="description" content="Premium curated 10-set examination preparation bundles for Physics, Basic Electrical Engineering, and Mathematics.">
+  <title>AuraExam — Strategic Exam Preparation Bundles</title>
+
+  <!-- Typography: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- Ambient Chromatic Glow -->
+  <div class="ambient-glow glow-primary"></div>
+  <div class="ambient-glow glow-secondary"></div>
+  <div class="ambient-glow glow-tertiary"></div>
+
+  <!-- Navigation Bar -->
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="AuraExam Homepage">
+      <div class="brand-glyph">
+        <div class="glyph-ring ring-outer"></div>
+        <div class="glyph-ring ring-inner"></div>
+        <div class="glyph-orb"></div>
+      </div>
+      <span id="navBrandName">AuraExam</span>
+    </a>
+    <nav>
+      <a href="#products">Question Papers</a>
+      <a href="#how">How It Works</a>
+      <a href="#refundDetails">75% Refund Policy</a>
+      <a href="refund.html">Submit Refund</a>
+      <a href="admin.html">Admin Portal</a>
+    </nav>
+    <div class="topbar-actions">
+      <a class="cart-pill" href="#checkout" aria-label="View Cart">
+        <span>Cart</span>
+        <span class="cart-count" id="cartCountBadge">0</span>
+      </a>
+      <a class="btn btn-primary" href="#products">Get Bundles</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="eyebrow-badge">
+        <i></i> Strategic Examination Revision
+      </div>
+      <h1>Master the curriculum.<br><em>Practice with precision.</em></h1>
+      <p class="hero-subhead">
+        Ten comprehensive, high-probability question paper sets packed into one complete PDF bundle for every subject. Designed for structured, high-yield examination practice.
+      </p>
+
+      <div class="hero-cta-group">
+        <a class="btn btn-primary" href="#products">Explore Available Subjects <span>→</span></a>
+        <a class="btn btn-secondary" href="#how">How Delivery Works</a>
+      </div>
+
+      <div class="hero-glass-capsule glass">
+        <div class="capsule-item">
+          <div class="capsule-icon">📄</div>
+          <div class="capsule-text">
+            <strong>10 Full Sets Per Subject</strong>
+            <small>One single high-res PDF bundle</small>
+          </div>
+        </div>
+        <div class="capsule-item">
+          <div class="capsule-icon">⚡</div>
+          <div class="capsule-text">
+            <strong>Instant Delivery</strong>
+            <small>Direct private Google Drive access</small>
+          </div>
+        </div>
+        <div class="capsule-item">
+          <div class="capsule-icon">🛡️</div>
+          <div class="capsule-text">
+            <strong>75% Money-Back Policy</strong>
+            <small>Subject-wise concept match guarantee</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Catalogue -->
+    <section class="section" id="products">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow-badge">Catalogue</div>
+          <h2>Select your subjects.</h2>
+        </div>
+        <p>Every purchased subject delivers ONE complete PDF containing 10 full question-paper sets plus bonus formula sheets.</p>
+      </div>
+
+      <div class="product-grid" id="productGrid">
+        <!-- Physics Card -->
+        <article class="product-card glass glass-interactive">
+          <div>
+            <div class="product-card-top">
+              <div class="subject-glyph glyph-physics">∿</div>
+              <span class="badge-ten-sets">10 SETS · 1 BUNDLE</span>
+            </div>
+            <h3>Physics</h3>
+            <p>Comprehensive coverage of classical mechanics, electromagnetism, wave optics, modern physics, and core derivations.</p>
+            <ul class="product-features-list">
+              <li>10 complete examination simulation sets</li>
+              <li>High-weightage derivations & numerical practice</li>
+              <li>Includes free Formula Master Compendium</li>
+            </ul>
+          </div>
+          <div class="product-card-bottom">
+            <div class="product-price">
+              <small>Price</small>
+              <strong>₹150</strong>
+            </div>
+            <button class="btn-select" data-slug="physics" aria-label="Add Physics">Add to Cart <span>＋</span></button>
+          </div>
+        </article>
+
+        <!-- BEE Card -->
+        <article class="product-card glass glass-interactive">
+          <div>
+            <div class="product-card-top">
+              <div class="subject-glyph glyph-bee">ϟ</div>
+              <span class="badge-ten-sets">10 SETS · 1 BUNDLE</span>
+            </div>
+            <h3>Basic Electrical Engineering</h3>
+            <p>Master DC mesh/nodal analysis, single/three-phase AC circuits, magnetic circuits, transformers, and DC machines.</p>
+            <ul class="product-features-list">
+              <li>10 complete examination simulation sets</li>
+              <li>Step-by-step circuit problems and phasor analysis</li>
+              <li>Includes free Electrical Quick-Reference Guide</li>
+            </ul>
+          </div>
+          <div class="product-card-bottom">
+            <div class="product-price">
+              <small>Price</small>
+              <strong>₹150</strong>
+            </div>
+            <button class="btn-select" data-slug="bee" aria-label="Add Basic Electrical Engineering">Add to Cart <span>＋</span></button>
+          </div>
+        </article>
+
+        <!-- Mathematics Card -->
+        <article class="product-card glass glass-interactive">
+          <div>
+            <div class="product-card-top">
+              <div class="subject-glyph glyph-math">π</div>
+              <span class="badge-ten-sets">10 SETS · 1 BUNDLE</span>
+            </div>
+            <h3>Mathematics</h3>
+            <p>Extensive practice in linear algebra, eigenvalues, multivariate calculus, differential equations, and complex variables.</p>
+            <ul class="product-features-list">
+              <li>10 complete examination simulation sets</li>
+              <li>Conceptual proofs and essential numerical techniques</li>
+              <li>Includes free Calculus & Matrix Formula Card</li>
+            </ul>
+          </div>
+          <div class="product-card-bottom">
+            <div class="product-price">
+              <small>Price</small>
+              <strong>₹100</strong>
+            </div>
+            <button class="btn-select" data-slug="mathematics" aria-label="Add Mathematics">Add to Cart <span>＋</span></button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Checkout Section -->
+    <section class="section" id="checkout">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow-badge">Checkout</div>
+          <h2>Review and purchase.</h2>
+        </div>
+        <p>Complete your academic details. Your materials will be dispatched to your email address automatically upon payment verification.</p>
+      </div>
+
+      <div class="checkout-grid">
+        <!-- Customer Form -->
+        <form id="orderForm" class="glass form-card">
+          <div class="form-header">
+            <h3>Student Identification</h3>
+            <p>Used to verify purchases, grant private Google Drive access, and process eligible refunds.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input id="fullName" name="fullName" type="text" required minlength="2" maxlength="120" placeholder="e.g. John Doe">
+          </div>
+
+          <div class="form-group">
+            <label for="rollNumber">Roll Number / Academic Registration Number</label>
+            <input id="rollNumber" name="rollNumber" type="text" required maxlength="60" placeholder="e.g. 21051234">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email Address <small>(for Drive access)</small></label>
+              <input id="email" name="email" type="email" required placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+              <label for="mobile">Mobile Number <small>(10-digit)</small></label>
+              <input id="mobile" name="mobile" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" required placeholder="9876543210">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="refundUpiId">UPI ID <small>(Collected solely for eligible 75% refunds)</small></label>
+            <input id="refundUpiId" name="refundUpiId" type="text" required placeholder="username@okhdfcbank">
+          </div>
+
+          <div class="terms-container">
+            <input id="termsCheckbox" type="checkbox" name="terms" required>
+            <label for="termsCheckbox">
+              I understand that each purchased subject contains 10 sets in 1 PDF. I agree to the <a href="#refundDetails">75% concept-matching refund policy</a> and confirm this is independent educational study material.
+            </label>
+          </div>
+
+          <button id="payButton" type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+            Pay with Razorpay <span>→</span>
+          </button>
+
+          <div class="security-badge-note">
+            <span>🔒 Encrypted 256-Bit SSL Checkout · Razorpay PCI-DSS Compliant</span>
+          </div>
+
+          <div id="statusToast" class="status-toast" role="alert"></div>
+        </form>
+
+        <!-- Order Summary -->
+        <aside class="glass summary-card">
+          <div>
+            <div class="summary-head">
+              <h3>Order Summary</h3>
+              <span class="lock-badge">✓ Secure</span>
+            </div>
+
+            <div class="summary-items-list" id="summaryItemsList">
+              <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-top: 30px;">
+                No subjects selected. Click "Add to Cart" on any subject above.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <div class="summary-totals">
+              <div class="total-row">
+                <span>Selected Bundles</span>
+                <span id="selectedCountText">0 subjects</span>
+              </div>
+              <div class="total-row">
+                <span>Complementary Study Material</span>
+                <span style="color: var(--accent-emerald);">FREE (₹0)</span>
+              </div>
+              <div class="total-row grand-total">
+                <span>Total Amount</span>
+                <strong id="grandTotalDisplay">₹0</strong>
+              </div>
+            </div>
+
+            <div class="bundle-perks-box">
+              <strong>Bundle Inclusions:</strong>
+              <span>✓ 1 Complete PDF per subject containing 10 sets</span>
+              <span>✓ High-yield numericals, derivations & concept practice</span>
+              <span>✓ Automated private Google Drive delivery by email</span>
+              <span>✓ 75% subject-wise concept-matching refund guarantee</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section" id="how">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow-badge">Workflow</div>
+          <h2>Simple, automated delivery.</h2>
+        </div>
+        <p>From checkout to your study desk in minutes.</p>
+      </div>
+
+      <div class="how-it-works-grid">
+        <div class="glass step-card">
+          <div class="step-number">01</div>
+          <h3>Select Subjects</h3>
+          <p>Choose any combination of Physics, Basic Electrical Engineering, and Mathematics bundles.</p>
+        </div>
+        <div class="glass step-card">
+          <div class="step-number">02</div>
+          <h3>Secure Payment</h3>
+          <p>Complete checkout via Razorpay using UPI (Google Pay, PhonePe, Paytm), Debit/Credit Cards, or Netbanking.</p>
+        </div>
+        <div class="glass step-card">
+          <div class="step-number">03</div>
+          <h3>Instant PDF Access</h3>
+          <p>Our automated delivery worker shares the private Google Drive PDF with your email address and dispatches a delivery receipt.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Refund Policy Section -->
+    <section class="section" id="refundDetails">
+      <div class="glass policy-card">
+        <div class="eyebrow-badge">Transparent Terms</div>
+        <h2>75% Subject-Wise Money-Back Policy</h2>
+        <p>
+          If none of the questions in the purchased subject's 10-set question-paper bundle matches the corresponding university examination, you are entitled to request a <strong>75% refund</strong> of that subject's purchase price.
+        </p>
+        <p>
+          <strong>The Concept-Matching Clause:</strong> Examination questions may vary in exact numerical values, phrasing, diagrams, or units. A question is considered a <em>match</em> if the underlying concept, scientific principle, structural derivation, or method of solving is substantially identical. A numerical problem with altered figures but identical solution steps counts as a concept match.
+        </p>
+        <p>
+          If at least one question matches the examination paper, no refund is available for that subject. All refund decisions are evaluated individually per subject by reviewing the actual question paper uploaded as evidence within the claim window.
+        </p>
+        <p class="policy-disclaimer">
+          <strong>Important Educational Notice:</strong> AuraExam provides independent, student-curated predictive practice and revision bundles. We are not affiliated with, endorsed by, or representative of any specific university or examination board. No leaked or confidential examination papers are hosted or sold.
+        </p>
+        <div style="margin-top: 20px;">
+          <a class="btn btn-secondary" href="refund.html">Submit Refund Request <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Post-Payment Receipt Modal -->
+  <div id="receiptModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="glass modal-dialog">
+      <div style="font-size: 3rem;">🎉</div>
+      <h3 id="modalTitle">Payment Verified!</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;" id="modalDesc">
+        Your payment has been successfully captured. Your Google Drive PDF materials are being prepared for dispatch.
+      </p>
+      <div class="bundle-perks-box" style="text-align: left; margin-bottom: 24px;">
+        <div><strong>Order Reference:</strong> <span id="modalOrderNum">EP-XXXXXX</span></div>
+        <div><strong>Delivery Email:</strong> <span id="modalEmail">user@example.com</span></div>
+        <div><strong>Purchased Bundles:</strong> <span id="modalBundles">Physics, BEE</span></div>
+      </div>
+      <button id="modalCloseBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">
+        Done <span>✓</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <a class="brand" href="#">
+      <div class="brand-glyph">
+        <div class="glyph-ring ring-outer"></div>
+        <div class="glyph-ring ring-inner"></div>
+        <div class="glyph-orb"></div>
+      </div>
+      <span id="footerBrandName">AuraExam</span>
+    </a>
+    <span>Curated Revision Bundles · 10 Sets In 1 PDF</span>
+    <div style="display: flex; gap: 20px;">
+      <a href="refund.html">Refund Portal</a>
+      <a href="admin.html">Admin Login</a>
+      <a id="supportEmailLink" href="mailto:support@auraexam.com">Customer Support</a>
+    </div>
+    <small>© <span id="currentYear">2026</span> AuraExam. All rights reserved.</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

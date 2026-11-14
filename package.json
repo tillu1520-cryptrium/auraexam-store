@@ -1,0 +1,15 @@
+{
+  "name": "exam-paper-store",
+  "version": "1.0.0",
+  "description": "Premium Apple-Inspired Exam Preparation Question Paper Platform",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "node scripts/build.js",
+    "start": "npx serve web"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

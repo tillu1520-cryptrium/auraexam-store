@@ -1,0 +1,35 @@
+# Environment & Secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+credentials.json
+client_secret*.json
+service_account*.json
+token*.json
+
+# Dependencies
+node_modules/
+vendor/
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Build & Cache
+dist/
+build/
+.cache/
+.netlify/
+
+
+.vercel

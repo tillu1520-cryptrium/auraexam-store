@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07090E">
+  <title>AuraExam Admin — Enterprise Management Portal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="background-color: var(--bg-dark);">
+  <!-- Ambient Glow -->
+  <div class="ambient-glow glow-primary"></div>
+  <div class="ambient-glow glow-tertiary"></div>
+
+  <!-- Authentication Guard Gate -->
+  <div id="loginGate" class="section" style="max-width: 440px; margin: 100px auto;">
+    <div class="glass form-card" style="text-align: center;">
+      <div class="brand-glyph" style="margin: 0 auto 16px;">
+        <div class="glyph-ring ring-outer"></div>
+        <div class="glyph-ring ring-inner"></div>
+        <div class="glyph-orb"></div>
+      </div>
+      <h2>Admin Sign In</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">
+        Restricted portal for authorized administrators only.
+      </p>
+
+      <form id="adminLoginForm">
+        <div class="form-group" style="text-align: left;">
+          <label for="adminEmail">Administrator Email</label>
+          <input id="adminEmail" type="email" required placeholder="admin@auraexam.com">
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label for="adminPassword">Password</label>
+          <input id="adminPassword" type="password" required placeholder="••••••••••••">
+        </div>
+        <button id="adminLoginBtn" type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          Access Dashboard <span>→</span>
+        </button>
+        <div id="loginStatusToast" class="status-toast" role="alert"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Authenticated Admin Dashboard -->
+  <div id="adminDashboard" class="admin-layout" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div>
+        <a class="brand" href="#">
+          <div class="brand-glyph">
+            <div class="glyph-ring ring-outer"></div>
+            <div class="glyph-ring ring-inner"></div>
+            <div class="glyph-orb"></div>
+          </div>
+          <span>AuraAdmin</span>
+        </a>
+
+        <nav class="admin-nav">
+          <div class="admin-nav-item active" data-tab="overview">📊 Overview</div>
+          <div class="admin-nav-item" data-tab="products">📚 Product Catalog</div>
+          <div class="admin-nav-item" data-tab="orders">📦 Order Management</div>
+          <div class="admin-nav-item" data-tab="refunds">🛡️ 75% Refund Claims</div>
+          <div class="admin-nav-item" data-tab="resources">🎁 Bonus Materials</div>
+          <div class="admin-nav-item" data-tab="audit">📝 Audit & Webhooks</div>
+        </nav>
+      </div>
+
+      <div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;" id="adminUserBadge">Logged in as Admin</div>
+        <button id="adminLogoutBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 10px;">
+          Log Out <span>⇥</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content Workspace -->
+    <main class="admin-content">
+      <!-- 1. OVERVIEW TAB -->
+      <section id="tab-overview" class="admin-tab-pane">
+        <div class="admin-header">
+          <div>
+            <div class="eyebrow-badge">Operations</div>
+            <h1>Performance Overview</h1>
+          </div>
+          <button id="refreshStatsBtn" class="btn btn-secondary">Refresh Data <span>↻</span></button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="glass stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="statRevenue">₹0</div>
+            <div class="stat-subtext">Verified captured payments</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value" id="statOrders">0</div>
+            <div class="stat-subtext">All-time student checkouts</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-label">Paid Orders</div>
+            <div class="stat-value" id="statPaid" style="color: var(--accent-emerald);">0</div>
+            <div class="stat-subtext">Successful completions</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-label">PDF Deliveries</div>
+            <div class="stat-value" id="statDeliveries">0</div>
+            <div class="stat-subtext">Drive permissions provisioned</div>
+          </div>
+          <div class="glass stat-card">
+            <div class="stat-label">Refund Requests</div>
+            <div class="stat-value" id="statRefunds" style="color: #FFD15C;">0</div>
+            <div class="stat-subtext">Awaiting administrative review</div>
+          </div>
+        </div>
+
+        <div class="glass" style="padding: 24px;">
+          <h3>Recent Orders</h3>
+          <div class="data-table-container">
+            <table class="admin-table" id="recentOrdersTable">
+              <thead>
+                <tr>
+                  <th>Order Number</th>
+                  <th>Student Email</th>
+                  <th>Amount</th>
+                  <th>Payment Status</th>
+                  <th>Delivery Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrdersBody">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading order transactions…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. PRODUCTS TAB -->
+      <section id="tab-products" class="admin-tab-pane" style="display: none;">
+        <div class="admin-header">
+          <div>
+            <div class="eyebrow-badge">Catalogue</div>
+            <h1>Subject Bundles Management</h1>
+          </div>
+          <button id="openAddProductModalBtn" class="btn btn-primary">Add New Subject <span>＋</span></button>
+        </div>
+
+        <div class="glass" style="padding: 24px;">
+          <div class="data-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Slug</th>
+                  <th>Subject Name</th>
+                  <th>Price (₹)</th>
+                  <th>Drive File ID</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminProductsTableBody">
+                <tr><td colspan="6" style="text-align: center;">Loading product catalogue…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. ORDERS TAB -->
+      <section id="tab-orders" class="admin-tab-pane" style="display: none;">
+        <div class="admin-header">
+          <div>
+            <div class="eyebrow-badge">Orders</div>
+            <h1>Student Transactions</h1>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <input id="orderSearchInput" class="search-input" type="text" placeholder="Search by Order # or Email…">
+          <select id="orderStatusFilter" class="btn btn-secondary" style="padding: 10px 16px;">
+            <option value="all">All Statuses</option>
+            <option value="paid">Paid</option>
+            <option value="payment_pending">Payment Pending</option>
+            <option value="payment_failed">Failed</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+
+        <div class="glass" style="padding: 24px;">
+          <div class="data-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Student Details</th>
+                  <th>Roll No</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Gateway ID</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="allOrdersTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading orders…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. REFUNDS TAB -->
+      <section id="tab-refunds" class="admin-tab-pane" style="display: none;">
+        <div class="admin-header">
+          <div>
+            <div class="eyebrow-badge">Refunds</div>
+            <h1>75% Policy Claims Review</h1>
+          </div>
+        </div>
+
+        <div class="glass" style="padding: 24px;">
+          <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            Review student-submitted examination paper evidence. Under the policy, if at least 1 question is a concept match, no refund is granted. If zero questions match, a 75% refund of that subject's price is awarded.
+          </p>
+
+          <div class="data-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Claim ID</th>
+                  <th>Subject</th>
+                  <th>Exam Date</th>
+                  <th>Eligible 75% Amount</th>
+                  <th>Customer UPI</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="refundsTableBody">
+                <tr><td colspan="7" style="text-align: center;">No pending refund requests.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. RESOURCES TAB -->
+      <section id="tab-resources" class="admin-tab-pane" style="display: none;">
+        <div class="admin-header">
+          <div>
+            <div class="eyebrow-badge">Study Materials</div>
+            <h1>Complementary & Bonus Resources</h1>
+          </div>
+          <button id="openAddResourceModalBtn" class="btn btn-primary">Add Bonus Resource <span>＋</span></button>
+        </div>
+
+        <div class="glass" style="padding: 24px;">
+          <div class="data-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Resource Title</th>
+                  <th>Description</th>
+                  <th>Drive File ID</th>
+                  <th>Scope</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resourcesTableBody">
+                <tr><td colspan="6" style="text-align: center;">Loading bonus resources…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. AUDIT & WEBHOOKS TAB -->
+      <section id="tab-audit" class="admin-tab-pane" style="display: none;">
+        <div class="admin-header">
+          <div>
+            <div class="eyebrow-badge">System Health</div>
+            <h1>Audit Logs & Webhook Ingestion</h1>
+          </div>
+        </div>
+
+        <div class="glass" style="padding: 24px;">
+          <div class="data-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Actor</th>
+                  <th>Action</th>
+                  <th>Entity</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="auditLogsTableBody">
+                <tr><td colspan="5" style="text-align: center;">Loading system audit trail…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Edit / Add Subject Modal -->
+  <div id="productModal" class="admin-modal">
+    <div class="glass admin-modal-card">
+      <h3 id="productModalTitle">Configure Subject Bundle</h3>
+      <form id="productForm" style="margin-top: 20px;">
+        <input type="hidden" id="prodEditId">
+        <div class="form-group">
+          <label for="prodSlug">URL Slug (e.g. physics, bee)</label>
+          <input id="prodSlug" type="text" required>
+        </div>
+        <div class="form-group">
+          <label for="prodName">Subject Name</label>
+          <input id="prodName" type="text" required>
+        </div>
+        <div class="form-group">
+          <label for="prodDesc">Description</label>
+          <input id="prodDesc" type="text" required>
+        </div>
+        <div class="form-group">
+          <label for="prodPrice">Price (in Rupees, e.g. 150)</label>
+          <input id="prodPrice" type="number" required min="1" step="1">
+        </div>
+        <div class="form-group">
+          <label for="prodDriveId">Private Google Drive File ID (10-Set PDF)</label>
+          <input id="prodDriveId" type="text" placeholder="1A2B3C4D5E6F…">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('productModal').classList.remove('active');">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Subject <span>✓</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

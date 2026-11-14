@@ -367,13 +367,25 @@ returns boolean as $$
 begin
   return exists (
     select 1 from public.admin_users
-    where supabase_auth_id = auth.uid()
+    where (supabase_auth_id = (select auth.uid()) or lower(email) = lower((select auth.jwt()->>'email')))
       and active = true
   );
 end;
 $$ language plpgsql security definer;
 
+-- Grants for Data API
+grant select, update on public.admin_users to authenticated;
+grant all on public.products, public.bonus_resources, public.customers, public.orders, public.order_items, public.payments, public.deliveries, public.refunds to authenticated;
+grant select on public.audit_logs to authenticated;
+
 -- Admin Read/Write Policies for Authenticated Admin Users
+create policy "Admins can view their admin record" on public.admin_users for select to authenticated
+  using (supabase_auth_id = (select auth.uid()) or lower(email) = lower((select auth.jwt()->>'email')));
+
+create policy "Admins can update their admin record auth id" on public.admin_users for update to authenticated
+  using (lower(email) = lower((select auth.jwt()->>'email')))
+  with check (lower(email) = lower((select auth.jwt()->>'email')));
+
 create policy "Admins can view products" on public.products for all to authenticated using (public.is_admin());
 create policy "Admins can view bonus_resources" on public.bonus_resources for all to authenticated using (public.is_admin());
 create policy "Admins can view customers" on public.customers for all to authenticated using (public.is_admin());
@@ -384,9 +396,38 @@ create policy "Admins can view deliveries" on public.deliveries for all to authe
 create policy "Admins can view refunds" on public.refunds for all to authenticated using (public.is_admin());
 create policy "Admins can view audit_logs" on public.audit_logs for select to authenticated using (public.is_admin());
 
+-- Auto-link Auth Trigger: Whenever an admin logs in via Supabase Auth (GitHub or Password),
+-- link their auth.users id to the public.admin_users table automatically.
+create or replace function public.handle_admin_auth_link()
+returns trigger as $$
+begin
+  update public.admin_users
+  set supabase_auth_id = new.id,
+      updated_at = now()
+  where lower(email) = lower(new.email)
+    and (supabase_auth_id is null or supabase_auth_id <> new.id);
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created_link_admin on auth.users;
+create trigger on_auth_user_created_link_admin
+  after insert or update on auth.users
+  for each row execute function public.handle_admin_auth_link();
+
 -- ----------------------------------------------------------------------------
--- 6. INITIAL CATALOGUE SEED DATA
+-- 6. INITIAL CATALOGUE & ADMIN SEED DATA
 -- ----------------------------------------------------------------------------
+-- Pre-authorized Superadmin accounts
+insert into public.admin_users (email, full_name, role, active)
+values
+  ('babatillu1520@gmail.com', 'Tillu (Owner)', 'superadmin', true),
+  ('samarendranathpal46@gmail.com', 'Priyanshu Pal', 'superadmin', true)
+on conflict (email) do update set
+  role = 'superadmin',
+  active = true,
+  updated_at = now();
+
 insert into public.products (slug, name, description, price_paise, display_order, active)
 values
   ('physics', 'Physics', 'Complete 10-set bundle covering mechanics, electromagnetism, wave optics, modern physics, and high-probability examination derivations.', 15000, 1, true),

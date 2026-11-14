@@ -17,6 +17,7 @@
   const loginGate = document.getElementById('loginGate');
   const adminDashboard = document.getElementById('adminDashboard');
   const loginForm = document.getElementById('adminLoginForm');
+  const githubLoginBtn = document.getElementById('adminGithubLoginBtn');
   const loginToast = document.getElementById('loginStatusToast');
   const logoutBtn = document.getElementById('adminLogoutBtn');
   const userBadge = document.getElementById('adminUserBadge');
@@ -42,11 +43,10 @@
     loginToast.className = 'status-toast ' + (isError ? 'error' : 'success');
   }
 
-  // Check Authentication Status
+  // Check Authentication Status & Enforce Protected Admin Route
   async function checkAuthSession() {
     if (!client) {
-      // In local offline mode without remote Supabase, display demo dashboard
-      console.warn("Supabase client not connected. Running in demo admin mode.");
+      console.warn("Supabase client not connected. Running in preview demo mode.");
       loginGate.style.display = 'none';
       adminDashboard.style.display = 'grid';
       loadMockDashboardData();
@@ -55,17 +55,93 @@
 
     const { data: { session } } = await client.auth.getSession();
     if (session) {
-      loginGate.style.display = 'none';
-      adminDashboard.style.display = 'grid';
-      if (userBadge) userBadge.textContent = `Logged in: ${session.user.email}`;
-      loadLiveDashboardData();
+      await verifyAdminAccess(session);
     } else {
       loginGate.style.display = 'block';
       adminDashboard.style.display = 'none';
     }
   }
 
-  // Admin Login
+  // Verify Admin Permissions against database
+  async function verifyAdminAccess(session) {
+    if (!session || !session.user) {
+      loginGate.style.display = 'block';
+      adminDashboard.style.display = 'none';
+      return;
+    }
+
+    try {
+      showToast("Verifying administrator clearance…", false);
+
+      // 1. Query admin_users table for linked auth ID
+      const { data: adminRecord, error: adminErr } = await client
+        .from('admin_users')
+        .select('id, email, role, active')
+        .eq('supabase_auth_id', session.user.id)
+        .eq('active', true)
+        .maybeSingle();
+
+      if (adminRecord) {
+        grantAdminAccess(session, adminRecord);
+        return;
+      }
+
+      // 2. Fallback: match by verified email (auto-link auth ID if pre-seeded)
+      if (session.user.email) {
+        const { data: emailRecord } = await client
+          .from('admin_users')
+          .select('id, email, role, active')
+          .eq('email', session.user.email.toLowerCase())
+          .eq('active', true)
+          .maybeSingle();
+
+        if (emailRecord) {
+          await client
+            .from('admin_users')
+            .update({ supabase_auth_id: session.user.id, updated_at: new Date().toISOString() })
+            .eq('id', emailRecord.id);
+
+          grantAdminAccess(session, emailRecord);
+          return;
+        }
+      }
+
+      // 3. User is authenticated with Supabase, but NOT an admin
+      showToast(`Access Denied: ${session.user.email} is not registered as an administrator.`, true);
+      setTimeout(async () => {
+        await client.auth.signOut();
+        loginGate.style.display = 'block';
+        adminDashboard.style.display = 'none';
+      }, 3500);
+
+    } catch (err) {
+      console.error("Admin verification error:", err);
+      showToast("Error checking admin privileges: " + (err.message || "Network error"), true);
+    }
+  }
+
+  function grantAdminAccess(session, adminRecord) {
+    loginGate.style.display = 'none';
+    adminDashboard.style.display = 'grid';
+    if (userBadge) {
+      userBadge.textContent = `Logged in: ${session.user.email} (${adminRecord.role.toUpperCase()})`;
+    }
+    loadLiveDashboardData();
+  }
+
+  // Listen to Supabase Auth State Changes (OAuth redirects, token refresh, signout)
+  if (client) {
+    client.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        await verifyAdminAccess(session);
+      } else if (event === 'SIGNED_OUT') {
+        loginGate.style.display = 'block';
+        adminDashboard.style.display = 'none';
+      }
+    });
+  }
+
+  // Admin Login via Email/Password
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -87,9 +163,31 @@
         const { data, error } = await client.auth.signInWithPassword({ email, password });
         if (error) throw error;
         showToast("Access granted!", false);
-        setTimeout(checkAuthSession, 400);
       } catch (err) {
         showToast(err.message || "Invalid administrator credentials.", true);
+      }
+    });
+  }
+
+  // Admin Login via GitHub OAuth
+  if (githubLoginBtn) {
+    githubLoginBtn.addEventListener('click', async () => {
+      if (!client) {
+        showToast("Supabase client not configured yet. Configure config.js first.", true);
+        return;
+      }
+
+      showToast("Initiating GitHub OAuth flow…", false);
+      try {
+        const { error } = await client.auth.signInWithOAuth({
+          provider: 'github',
+          options: {
+            redirectTo: window.location.origin + window.location.pathname
+          }
+        });
+        if (error) throw error;
+      } catch (err) {
+        showToast(err.message || "GitHub authentication failed.", true);
       }
     });
   }
